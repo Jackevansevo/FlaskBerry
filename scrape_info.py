@@ -5,6 +5,8 @@ import requests
 
 # [TODO] Register a google Books API key to prevent being rate limited
 google_books_api = 'https://www.googleapis.com/books/v1/volumes?q=isbn:'
+amazon_images_api = 'http://images.amazon.com/images/P/'
+
 
 # Boolean flag determining whether user data is clobbered
 overrite_metadata = True
@@ -51,9 +53,12 @@ def populate_fields(book):
             except KeyError:
                 pass
             try:
-                book.author = ' '.join(volume_info.get('authors'))
+                book.author = ' '.join(volume_info['authors'])
             except KeyError:
                 pass
+
+    if not book.img:
+        book.img = amazon_images_api + book.isbn
 
 
 if __name__ == '__main__':
