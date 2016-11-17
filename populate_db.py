@@ -28,13 +28,14 @@ orm.sql_debug(True)
 BookTuple = namedtuple('Book', 'title genre isbn')
 
 books = (
-    BookTuple('Flask Web Development', 'Programming', '1449372627'),
-    BookTuple('Clojure for the Brave and True', 'Programming', '1593275919'),
+    BookTuple('C Programming Language', 'Programming', '0133086216'),
+    BookTuple('C in a Nutshell', 'Programming', '0596550715'),
     BookTuple('Clojure Programming', 'Programming', '1449335349'),
-    BookTuple('The Hobbit', 'Fiction', '0547951973'),
-    BookTuple('The Catcher In the Rye', 'Fiction', '3526523711'),
-    BookTuple('The Girl on the Train', 'Fiction', '0552779776'),
-    BookTuple('A Brief History of Time', 'Science', '0593060504'),
+    BookTuple('Clojure for the Brave and True', 'Programming', '1593275919'),
+    BookTuple('Flask Web Development', 'Programming', '1449372627'),
+    BookTuple('Go In Action', 'Programming', '1617291781'),
+    BookTuple('The Go Programming Language', 'Programming', '0134190564'),
+    BookTuple('Amazon Web Services in Action', 'Programming', '1617292885'),
 )
 
 # Commit changes inside a transaction
