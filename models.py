@@ -38,7 +38,7 @@ class Book(db.Entity):
     subtitle = orm.Optional(str)
     author = orm.Optional(str)
     genre = orm.Optional(str)
-    isbn = orm.Optional(str)
+    isbn = orm.Optional(str, unique=True)
     img = orm.Optional(str)
     lender = orm.Optional(Customer)
     slug = orm.Optional(str, unique=True)
