@@ -7,7 +7,9 @@
         <link rel="stylesheet" href="https://unpkg.com/tachyons@4.5.5/css/tachyons.min.css"/>
     </head>
     <nav class="pa3 pa4-ns">
-        <a class="link dim black b f6 f5-ns dib mr3" href="{{ url_for('index') }}" title="Home">FlaskBerry</a>
+        <a class="link dim black b f6 f5-ns dib mr3" title="Home">FlaskBerry</a>
+        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('index') }}" title="Home">Books</a>
+        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('customers') }}" title="Home">Customers</a>
         <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('add_book') }}" title="Home">Add Book</a>
     </nav>
     <body>
