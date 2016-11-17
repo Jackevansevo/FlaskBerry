@@ -1,5 +1,6 @@
-venv/*
-static/node_modules/*
+*.pyc
 __pycache__/
 db.sqlite
+static/node_modules/*
 tags
+venv/*
