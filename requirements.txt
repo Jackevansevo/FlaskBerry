@@ -1,0 +1,5 @@
+awesome-slugify
+Flask
+Faker
+requests
+pony

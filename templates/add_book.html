@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+<article class="pa4 black-80">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <form method="post" accept-charset="utf-8">
+        <fieldset class="ba b--transparent ph0 mh0">
+            <legend class="ph0 mh0 fw6 clip">Add Book</legend>
+            <div class="mt3">
+                <label class="db fw4 lh-copy f6" for="isbn">ISBN e.g. 0545582970 (Harry Potter)</label>
+                <input class="pa2 input-reset ba bg-transparent w-100 measure" type="text" name="isbn" id="isbn" autofocus=True>
+            </div>
+        </fieldset>
+        <div class="mt3"><input class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Add Book"></div>
+    </form>
+</article>
+{% endblock %}
