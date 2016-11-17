@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
-import os
+from flask import Flask, render_template, flash, redirect, url_for
 
-from models import db, Book
+from forms import BookSubmissionForm
+from models import db, Book, Customer
 from pony import orm
 
 
@@ -15,37 +15,34 @@ db.generate_mapping(create_tables=True)
 orm.sql_debug(True)
 
 
-# Load default config and override config from an environment variable
-app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'db.sqlite'),
-    SECRET_KEY='\xcb-\xb0\xa3$\xf0t\x88\xd4a\x19Q_\x0f-\xd0F\xe2\x0c\xd4Mf',
-    USERNAME='admin',
-    PASSWORD='default'
-))
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
-
-
 @app.route('/')
+@orm.db_session(strict=True)
 def index():
-    with orm.db_session:
-        books = Book.select()[:]
+    books = Book.select()
     return render_template('index.html', books=books)
+
+
+@app.route('/customers')
+@orm.db_session(strict=True)
+def customers():
+    customers = Customer.select()
+    return render_template('customers.html', customers=customers)
 
 
 @app.route('/add-book', methods=['POST', 'GET'])
 def add_book():
     """Simple view to add a book"""
-    if request.method == 'POST':
-        form = request.form
+    form = BookSubmissionForm()
+    if form.validate_on_submit():
         try:
             with orm.db_session:
-                Book(isbn=form['isbn'])
+                Book(isbn=form.isbn.data)
                 orm.commit()
         except orm.core.TransactionIntegrityError:
             flash('Book already exists!')
         else:
             return redirect(url_for('index'))
-    return render_template('add_book.html')
+    return render_template('add_book.html', form=form)
 
 
 @app.route('/book/<slug>')
@@ -54,12 +51,6 @@ def book(slug):
         book = Book.get(slug=slug)
     return render_template('book_page.html', book=book)
 
-
-def valid_isbn(isbn):
-    listofnums = [int(digit) for digit in isbn]
-    multipliers = reversed(range(2, 12))
-    multipliednums = [a*b for a, b in zip(listofnums, multipliers)]
-    return sum(multipliednums) % 11
 
 if __name__ == '__main__':
     app.run(debug=True)
