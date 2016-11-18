@@ -27,26 +27,18 @@ orm.sql_debug(True)
 
 BookTuple = namedtuple('Book', 'title genre isbn')
 
-books = (
-    BookTuple('C Programming Language', 'Programming', '0133086216'),
-    BookTuple('C in a Nutshell', 'Programming', '0596550715'),
-    BookTuple('Clojure Programming', 'Programming', '1449335349'),
-    BookTuple('Clojure for the Brave and True', 'Programming', '1593275919'),
-    BookTuple('Flask Web Development', 'Programming', '1449372627'),
-    BookTuple('Go In Action', 'Programming', '1617291781'),
-    BookTuple('The Go Programming Language', 'Programming', '0134190564'),
-    BookTuple('Amazon Web Services in Action', 'Programming', '1617292885'),
-)
+books = ('1491946008',  '1633430235', '1593275919', '0545582970')
+
 
 # Commit changes inside a transaction
 with orm.db_session:
 
     # Create some Sample customers
-    for i in range(1, 20):
+    for i in range(1, 5):
         Customer(forename=faker.first_name(), surname=faker.last_name())
 
     # Create some sample books
-    for book in books:
-        Book(**book._asdict())
+    for isbn in books:
+        Book(isbn=isbn)
 
     orm.commit()

@@ -8,12 +8,15 @@
     </head>
     <nav class="pa3 pa4-ns">
         <a class="link dim black b f6 f5-ns dib mr3" title="Home">FlaskBerry</a>
-        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('index') }}" title="Home">Books</a>
-        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('customers') }}" title="Home">Customers</a>
-        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('add_book') }}" title="Home">Add Book</a>
+        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('books') }}" title="Books">Books</a>
+        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('authors') }}" title="Authors">Authors</a>
+        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('customers') }}" title="Customers">Customers</a>
+        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('add_book') }}" title="AddBook">Add Book</a>
     </nav>
     <body>
         {% block body %}
         {% endblock body %}
     </body>
+    {% block scripts %}
+    {% endblock %}
 </html>

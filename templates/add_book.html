@@ -1,30 +1,39 @@
 {% extends "base.html" %}
 {% block body %}
 <article class="pa4 black-80">
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class=flashes>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
     <form method="post" accept-charset="utf-8">
         {{ form.csrf_token }}
-        {% if form.isbn.errors %}
-            {% for error in form.isbn.errors %}
-                <p class="red">{{ error }}</p>
-            {% endfor %}
-        {% endif %}
+
+
+        <fieldset class="ba b--transparent ph0 mh0">
+            <legend class="ph0 mh0 fw6 clip">Recaptcha</legend>
+            <div class="mt3">
+                <label class="db fw4 lh-copy f6" for="isbn">Prove you're not a robot</label>
+                {{ form.recaptcha }}
+            </div>
+            {% if form.recaptcha.errors %}
+                {% for error in form.recaptcha.errors %}
+                    <p class="red">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </fieldset>
+
         <fieldset class="ba b--transparent ph0 mh0">
             <legend class="ph0 mh0 fw6 clip">Add Book</legend>
             <div class="mt3">
-                <label class="db fw4 lh-copy f6" for="isbn">ISBN e.g. 0545582970 (Harry Potter)</label>
-                <input class="pa2 input-reset ba bg-transparent w-100 measure" type="text" maxlength="13" minlength="10" name="isbn" id="isbn" placeholder="Enter ISBN ..." autofocus=True>
+                <label class="db fw4 lh-copy f6" for="isbn">{{ form.isbn.label }}</label>
+                <input class="pa2 input-reset ba bg-transparent w-100 measure" type="text" minlength="10" name="isbn" id="isbn" placeholder="Enter ISBN ..." autofocus=True>
             </div>
+            {% if form.isbn.errors %}
+                {% for error in form.isbn.errors %}
+                    <p class="red">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
         </fieldset>
         <div class="mt3"><input class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Add Book"></div>
     </form>
 </article>
+{% endblock %}
+{% block scripts %}
+    <script src='https://www.google.com/recaptcha/api.js'></script>
 {% endblock %}

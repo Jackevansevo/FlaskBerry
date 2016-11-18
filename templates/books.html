@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<article>
+    <div class="cf pa2">
+        {% for book in books %}
+            <div class="fl w-50 w-25-m w-20-l pa3">
+                <a href="{{ book.url }}" class="db link dim tc">
+                    <img src="{{ book.img }}" alt="{{ book.title }} - Book Cover" class="center db br3" style="max-height: 168px; max-width: 128px;"/>
+                    <dl class="mt2 f6 lh-copy">
+                        <dt class="clip">Title</dt>
+                        <dd class="ml0 black truncate w-100">{{ book.title }}</dd>
+                        <dt class="clip">Author</dt>
+                        <dd class="ml0 gray truncate w-100">{{ book.author_names }}</dd>
+                    </dl>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</article>
+{% endblock body %}

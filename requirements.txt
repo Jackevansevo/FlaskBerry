@@ -1,5 +1,6 @@
 awesome-slugify
 Flask
+Flask-WTF
 Faker
 requests
 pony

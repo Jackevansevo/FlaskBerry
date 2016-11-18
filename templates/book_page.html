@@ -7,10 +7,16 @@
         <hr class="mw3 bb bw1 b--black-10">
     </div>
     <p class="lh-copy measure center tc f6 black-70">
-        <b>Author: </b> {{ book.author }}
+        <b>Author: </b>
+        {% for author in book.authors %}
+            <a href="{{ author.url }}">{{ author }}</a>
+        {% endfor %}
     </p>
     <p class="lh-copy measure center tc f6 black-70">
         <b>Loaned By: </b> {{ book.lender }}
+    </p>
+    <p class="lh-copy measure center tc f6 black-70">
+        <b>ISBN: </b> {{ book.isbn }}
     </p>
 </article>
 {% endblock %}
