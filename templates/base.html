@@ -3,15 +3,25 @@
     <head>
         <meta charset="UTF-8"> 
         <title>FlaskBerry</title>
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
         <link type="image/x-icon" rel="shortcut icon" href="{{ url_for('static', filename='img/favicon-book.ico') }}?v={{1.0.0}}">
         <link rel="stylesheet" href="https://unpkg.com/tachyons@4.5.5/css/tachyons.min.css"/>
     </head>
-    <nav class="pa3 pa4-ns">
-        <a class="link dim black b f6 f5-ns dib mr3" title="Home">FlaskBerry</a>
-        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('books') }}" title="Books">Books</a>
-        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('authors') }}" title="Authors">Authors</a>
-        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('customers') }}" title="Customers">Customers</a>
-        <a class="link dim gray    f6 f5-ns dib mr3" href="{{ url_for('add_book') }}" title="AddBook">Add Book</a>
+    <nav class="db dt-l w-100 border-box pa3">
+        <a class="db dtc-l v-mid mid-gray link dim tc tl-l mb2 mb0-l" href="{{ url_for('index') }}" title="FlaskBerry">
+            <img src="https://cdn2.iconfinder.com/data/icons/hand-drawn-academic-icons-2/300/handdrawn-flask-128.png" class="dib w2 h2 br-100" alt="FlaskBerry">
+        </a>
+        <div class="db dtc-l v-mid">
+            <form method="post" action="{{ url_for('books') }}">
+                <input class="pa2 input-reset ba br3 bg-light-gray measure center" name="query" placeholder="Search Books">
+            </form>
+        </div>
+        <div class="db dtc-l v-mid w-100 w-75-l tc tr-l">
+            <a class="link dim dark-gray f6 f5-l dib mr3 mr4-l" href="{{ url_for('books') }}" title="Home"><i class="fa fa-book fa-fw" aria-hidden="true"></i> Library</a>
+            <a class="link dim dark-gray f6 f5-l dib mr3 mr4-l" href="{{ url_for('authors') }}" title="How it Works"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Authors</a>
+            <a class="link dim dark-gray f6 f5-l dib mr3 mr4-l" href="{{ url_for('customers') }}" title="Blog"><i class="fa fa-users fa-fw" aria-hidden="true"></i> Customers</a>
+            <a class="link dim dark-gray f6 f5-l dib mr3 mr4-l" href="{{ url_for('add_book') }}" title="Press"><i class="fa fa-plus fa-fw" aria-hidden="true"></i>Add Book</a>
+        </div>
     </nav>
     <body>
         {% block body %}

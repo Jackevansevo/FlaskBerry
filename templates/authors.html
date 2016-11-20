@@ -6,13 +6,20 @@
         <a class="link dt w-100 bb b--black-10 pb2 mt2 dim blue" href="{{ author.url }}">
             <div class="dtc v-top pl2 mt2">
                 <h1 class="f6 f5-ns fw6 lh-title black mv0">{{ author.name }}</h1>
-                <h2 class="f6 fw4 mt2 mb0 black-60">
-                    {% for book in author.books %}
-                        <a href="{{ book.url }}">{{ book }}</a>
-                    {% endfor %}
-                </h2>
             </div>
         </a>
+        <div class="dtc v-top pb3 pl2 mt2">
+            <h2 class="f6 fw4 mt2 mb0 black-60">
+                <ul>
+                    {% for book in author.books %}
+                        <li>
+                            <a href="{{ book.url }}" class="link">{{ book }} </a>
+                            <p>Copies: {{ book.num_copies }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </h2>
+        </div>
     {% endfor %}
 </article>
 </main>

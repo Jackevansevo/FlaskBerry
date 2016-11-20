@@ -3,21 +3,6 @@
 <article class="pa4 black-80">
     <form method="post" accept-charset="utf-8">
         {{ form.csrf_token }}
-
-
-        <fieldset class="ba b--transparent ph0 mh0">
-            <legend class="ph0 mh0 fw6 clip">Recaptcha</legend>
-            <div class="mt3">
-                <label class="db fw4 lh-copy f6" for="isbn">Prove you're not a robot</label>
-                {{ form.recaptcha }}
-            </div>
-            {% if form.recaptcha.errors %}
-                {% for error in form.recaptcha.errors %}
-                    <p class="red">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-        </fieldset>
-
         <fieldset class="ba b--transparent ph0 mh0">
             <legend class="ph0 mh0 fw6 clip">Add Book</legend>
             <div class="mt3">

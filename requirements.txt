@@ -1,6 +1,6 @@
-awesome-slugify
+Faker
 Flask
 Flask-WTF
-Faker
-requests
 pony
+python-slugify
+requests

@@ -1,4 +1,4 @@
-from flask_wtf import FlaskForm, RecaptchaField
+from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
 from wtforms.validators import DataRequired
 from itertools import islice, cycle
@@ -29,7 +29,6 @@ class BookSubmissionForm(FlaskForm):
         'Book ISBN number e.g. 0545582970 (Harry Potter)',
         validators=[DataRequired()]
     )
-    recaptcha = RecaptchaField()
 
     def validate_isbn(form, field):
 

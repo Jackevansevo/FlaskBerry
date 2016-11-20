@@ -3,9 +3,11 @@
 <article>
     <div class="cf pa2">
         {% for book in author.books %}
-            <div class="fl w-50 w-25-m w-20-l pa3">
+            <div class="fl w-50 w-25-m w-10-l pa3">
                 <a href="{{ book.url }}" class="db link dim tc">
-                    <img src="{{ book.img }}" alt="{{ book.title }} - Book Cover" class="center db br3" style="max-height: 168px; max-width: 128px;"/>
+                    <div class="aspect-ratio aspect-ratio--3x4 mb4">
+                        <div class="aspect-ratio--object cover br4" style="background:url({{book.img}}) center;"></div>
+                    </div>
                     <dl class="mt2 f6 lh-copy">
                         <dt class="clip">Title</dt>
                         <dd class="ml0 black truncate w-100">{{ book.title }}</dd>

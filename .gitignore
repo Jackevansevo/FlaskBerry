@@ -2,5 +2,5 @@
 __pycache__/
 db.sqlite
 static/node_modules/*
-tags
+tags*
 venv/*
