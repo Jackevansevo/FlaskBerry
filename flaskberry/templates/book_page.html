@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block body %}
-<article class="mw5 center bg-white br3 pa3 pa4-ns mv3 ba b--black-10">
+<article class="mw5 center bg-white br3 pa3 pa4-ns mv3 ba b--black-10 relative">
+    <form method="post" action="{{ url_for('delete_book', isbn=book.isbn) }}">
+        <button class="hover-red pointer bn button-reset bg-white absolute bottom-1 right-1" type="submit"><i class="fa fa-trash fa-fw" aria-hidden="true"></i></button>
+    </form>
     <div class="tc">
         <img src="{{ book.img }}" alt="{{ book.title }} - Book Cover" class="center db br3">
         <h1 class="f4">{{ book.title }}</h1>
@@ -24,15 +27,8 @@
             {{ genre }}
         {% endfor %}
     </p>
-</article>
-<div class="w-100 dt">
-    <form class="di">
+    <form class="tc pv3">
         <input class="b green ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Checkout">
     </form>
-    <form class="di" method="post" action="{{ url_for('delete_book', isbn=book.isbn) }}">
-        <input class="b red ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Delete">
-    </form>
-</div>
-
-
+</article>
 {% endblock %}
