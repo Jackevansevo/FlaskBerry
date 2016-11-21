@@ -1,6 +1,7 @@
 Faker
 Flask
 Flask-WTF
+flask_script
 pony
 python-slugify
 requests

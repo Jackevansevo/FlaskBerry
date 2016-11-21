@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+
+{% block search %}
+<form method="post" action="{{ url_for('books') }}">
+    <input class="pa2 input-reset ba br3 bg-light-gray" name="query" placeholder="Search Books">
+</form>
+{% endblock search %}
+
 {% block body %}
 <article>
     <div class="cf pa2">
@@ -20,11 +27,11 @@
     </div>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <ul class=flashes>
+            <div>
                 {% for message in messages %}
-                    <li class="red">{{ message }}</li>
+                    <p class="tc f5 lh-copy dark-red">{{ message }}</p>
                 {% endfor %}
-            </ul>
+            </div>
         {% endif %}
     {% endwith %}
 </article>

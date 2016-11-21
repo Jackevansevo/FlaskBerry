@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
+<h1 class="pl4">{{ author.name }} Books</h1>
 <article>
     <div class="cf pa2">
         {% for book in author.books %}

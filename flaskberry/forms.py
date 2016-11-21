@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, ValidationError
+from wtforms import BooleanField, StringField, ValidationError
 from wtforms.validators import DataRequired
 from itertools import islice, cycle
 
@@ -46,3 +46,9 @@ class BookSubmissionForm(FlaskForm):
 
         if not isbn_13_is_valid(isbn):
             raise ValidationError('ISBN Number was Invalid')
+
+
+class LoginForm(FlaskForm):
+    email = StringField(validators=[DataRequired()])
+    password = StringField(validators=[DataRequired()])
+    remember_me = BooleanField('remember_me', default=False)

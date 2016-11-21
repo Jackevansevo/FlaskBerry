@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block search %}
+<form method="post" action="{{ url_for('authors') }}">
+    <input class="pa2 input-reset ba br3 bg-light-gray measure" name="query" placeholder="Search Authors">
+</form>
+{% endblock search %}
+
+{% block body %}
+<main class="mw6 center">
+<article>
+    {% for author in authors %}
+        <a class="link dt w-100 bb b--black-10 pb2 pt3 mt3 dim" href="{{ author.url }}">
+            <div class="dtc v-top pl2 mt2">
+                <h1 class="f6 f5-ns fw6 lh-title black mv0">{{ author.name }}</h1>
+            </div>
+        </a>
+        {% for book in author.books %}
+        <p>
+            <span class="pv2 ph3 tl">
+                <a href="{{ book.url }}" class="link">{{ book }} </a>
+            </span>
+            <span class="pv2 ph3 light-silver i tr">#{{ book.num_copies }}</span>
+        </p>
+        {% endfor %}
+    {% endfor %}
+</article>
+</main>
+{% endblock body %}

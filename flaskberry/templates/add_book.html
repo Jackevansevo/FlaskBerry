@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<article class="pa4 black-80">
+<article class="mw7 center br3 pa3 pa4-ns mv3 ba b--black-10">
     <form method="post" accept-charset="utf-8">
         {{ form.csrf_token }}
         <fieldset class="ba b--transparent ph0 mh0">
@@ -11,11 +11,11 @@
             </div>
             {% if form.isbn.errors %}
                 {% for error in form.isbn.errors %}
-                    <p class="red">{{ error }}</p>
+                    <p class="dark-red">{{ error }}</p>
                 {% endfor %}
             {% endif %}
         </fieldset>
-        <div class="mt3"><input class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Add Book"></div>
+        <div class="mt3"><input class="b ph3 pv2 input-reset green ba b--black bg-transparent grow pointer f6" type="submit" value="Add Book"></div>
     </form>
 </article>
 {% endblock %}

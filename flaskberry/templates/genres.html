@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block search %}
+<form method="post" action="{{ url_for('genres') }}">
+    <input class="pa2 input-reset ba br3 bg-light-gray measure" name="query" placeholder="Search Genres">
+</form>
+{% endblock search %}
+
+{% block body %}
+<main class="mw6 center">
+<article>
+    {% for genre in genres %}
+        <a class="link dt w-100 bb b--black-10 pb2 mt2 dim blue" href="{{ genre.url }}">
+            <div class="dtc v-top pl2 mt2">
+                <h1 class="f6 f5-ns fw6 lh-title black mv0">{{ genre.name }}</h1>
+            </div>
+        </a>
+        {% for book in genre.books %}
+            <p class="pv2 ph3">
+                <a href="{{ book.url }}" class="link">{{ book }} </a>
+                <span class="pv2 ph3 b light-silver i">#{{ book.num_copies }}</span>
+            </p>
+        {% endfor %}
+    {% endfor %}
+</article>
+</main>
+{% endblock body %}
