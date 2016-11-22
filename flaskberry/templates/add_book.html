@@ -14,6 +14,13 @@
                     <p class="dark-red">{{ error }}</p>
                 {% endfor %}
             {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="dark-red">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         </fieldset>
         <div class="mt3"><input class="b ph3 pv2 input-reset green ba b--black bg-transparent grow pointer f6" type="submit" value="Add Book"></div>
     </form>

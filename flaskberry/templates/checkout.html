@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<article class="mw7 center br3 pa3 pa4-ns mv3 ba b--black-10">
+    <form method="post" accept-charset="utf-8">
+        {{ form.csrf_token }}
+        <fieldset class="ba b--transparent ph0 mh0">
+            <legend class="ph0 mh0 fw6 clip">Customer ID</legend>
+            <div class="mt3">
+                <label class="db fw4 lh-copy f6" for="isbn">Customer ID</label>
+                <input class="pa2 input-reset ba bg-transparent w-100 measure" type="text" name="isbn" id="isbn" placeholder="Enter Customer ID ..." autofocus=True>
+            </div>
+        </fieldset>
+
+        <fieldset class="ba b--transparent ph0 mh0">
+            <legend class="ph0 mh0 fw6 clip">Book ISBN</legend> 
+            <div class="mt3">
+                <label class="db fw4 lh-copy f6" for="isbn">BOOK ISBN</label>
+                <input class="pa2 input-reset ba bg-transparent w-100 measure" value="{{ form.isbn.data }}" type="text" minlength="10" name="isbn" id="isbn" placeholder="Enter Book ISBN ..." autofocus=True>
+            </div>
+        </fieldset>
+        <div class="mt3"><input class="b ph3 pv2 input-reset green ba b--black bg-transparent grow pointer f6" type="submit" value="Give Book"></div>
+    </form>
+</article>
+{% endblock %}
+{% block scripts %}
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}

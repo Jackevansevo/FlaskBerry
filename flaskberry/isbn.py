@@ -13,7 +13,7 @@ api_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:{}&key={}'
 api_key = environ['BOOKS_API_KEY']
 META_KEYS = ('title', 'subtitle', 'authors', 'categories')
 
-CANONICAL_REGEX_PATTERN = compile('[^\dX]')
+CLEAN_REGEX_PATTERN = compile('[^\dX]')
 
 
 class InvalidISBNError(Exception):
@@ -27,6 +27,8 @@ def _calc_isbn_13_check_digit(isbn):
 
 
 def to_isbn13(isbn):
+    if len(isbn) == 13:
+        return isbn
     isbn = '978' + isbn
     return isbn[:-1] + str(_calc_isbn_13_check_digit(isbn))
 
@@ -74,5 +76,5 @@ def isbn_is_valid(isbn):
     return False
 
 
-def canonical(isbn):
-    return sub(CANONICAL_REGEX_PATTERN, '', isbn)
+def clean(isbn):
+    return sub(CLEAN_REGEX_PATTERN, '', isbn)

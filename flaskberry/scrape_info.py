@@ -9,17 +9,22 @@ def fetch_json(isbn):
         api_key = os.environ['BOOKS_API_KEY']
     except KeyError:
         print('Google Books API Key not found aborting')
-        return {}
+        raise Exception('ISBN: {} not found'.format(isbn))
     else:
         try:
             r = requests.get(api_url.format(isbn, api_key))
         except requests.exceptions.RequestException:
-            print('ISBN: {} not found'.format(isbn))
-            return {}
+            raise Exception('ISBN: {} not found'.format(isbn))
         else:
             try:
                 data = r.json()
             except ValueError:
-                print('JSON decoding failed fetching: {}'.format(isbn))
+                raise Exception('JSON decoding failed')
             else:
-                return data
+                try:
+                    volume_info = data['items'][0]['volumeInfo']
+                except(KeyError, IndexError):
+                    print('Volume info not found')
+                    raise Exception('Volume info not found')
+                else:
+                    return volume_info
