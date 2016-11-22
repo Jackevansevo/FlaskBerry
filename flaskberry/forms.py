@@ -1,27 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, ValidationError
+from wtforms import StringField, ValidationError
 from wtforms.validators import DataRequired
-from itertools import islice, cycle
-
-import re
-
-
-def calc_isbn_13_check_digit(isbn):
-    # wikipedia.org/wiki/International_Standard_Book_Number#ISBN-13_check_digit_calculation
-    multipliers = islice(cycle([1, 3]), 12)
-    res = 10 - sum([a*b for a, b in zip(isbn, multipliers)]) % 10
-    return 0 if res == 10 else res
-
-
-def convert_isbn10_to_isbn13(isbn):
-    # wikipedia.org/wiki/International_Standard_Book_Number#ISBN-10_to_ISBN-13_conversion
-    isbn = [9, 7, 8] + isbn
-    isbn[-1] = calc_isbn_13_check_digit(isbn)
-    return isbn
-
-
-def isbn_13_is_valid(isbn):
-    return not sum([a*b for a, b in zip(isbn, cycle([1, 3]))]) % 10
+from flaskberry.isbn import canonical, to_isbn13, is_isbn13
 
 
 class BookSubmissionForm(FlaskForm):
@@ -31,24 +11,7 @@ class BookSubmissionForm(FlaskForm):
     )
 
     def validate_isbn(form, field):
-
-        # Replace whitespace and dashes
-        field.data = re.sub(r'[\s+-]', '', field.data)
-
-        try:
-            isbn = [int(digit) for digit in field.data]
-        except ValueError:
-            raise ValidationError('Invalid characters in ISBN')
-
-        if len(isbn) == 10:
-            # Converts isbn10 to isbn13
-            isbn = convert_isbn10_to_isbn13(isbn)
-
-        if not isbn_13_is_valid(isbn):
+        field.data = canonical(field.data)
+        field.data = to_isbn13(field.data)
+        if not is_isbn13(field.data):
             raise ValidationError('ISBN Number was Invalid')
-
-
-class LoginForm(FlaskForm):
-    email = StringField(validators=[DataRequired()])
-    password = StringField(validators=[DataRequired()])
-    remember_me = BooleanField('remember_me', default=False)
