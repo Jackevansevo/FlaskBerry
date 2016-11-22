@@ -2,7 +2,7 @@ from faker import Factory as FakerFactory
 from flaskberry import db
 from flaskberry.models import Customer, add_book_copy
 from pony.orm import db_session, commit
-from isbnlib import to_isbn13
+from flaskberry.isbn import to_isbn13
 
 # Set up faker object
 faker = FakerFactory.create('en_GB')
