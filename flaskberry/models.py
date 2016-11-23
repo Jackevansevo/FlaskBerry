@@ -1,20 +1,47 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from flask import url_for
 from slugify import slugify
+from flask_login import UserMixin
 
 from pony.orm import Optional, PrimaryKey, Required, Set, count, commit
 
 from flaskberry import db
-from flaskberry.isbn import meta
+from flaskberry.isbn import meta, MetaDataNotFoundError
+
+# [TODO] For the love of God, please Hash the passwords
 
 
-class Customer(db.Entity):
+class Customer(db.Entity, UserMixin):
     forename = Required(str)
     surname = Required(str)
     email = Required(str)
     password = Required(str)
     slug = Optional(str, unique=True)
     loans = Set('Loan')
+    book_allowance = Required(int, default=1)
+
+    def get_id(self):
+        return str(self.id)
+
+    def check_password(self, password):
+        # [TODO] Handle password hashes
+        return password == self.password
+
+    def has_book(self, isbn):
+        return self.unreturned_loans.filter(
+            lambda l: l.book_copy.book.isbn == isbn).exists()
+
+    @property
+    def unreturned_loans(self):
+        return self.loans.select(lambda l: not l.returned)
+
+    @property
+    def can_loan(self):
+        return len(self.unreturned_loans) < self.book_allowance
+
+    @property
+    def url(self):
+        return url_for('customer', slug=self.slug)
 
     def before_insert(self):
         self.slug = slugify(str(self))
@@ -40,6 +67,14 @@ class Book(db.Entity):
     copies = Set('BookCopy')
 
     @property
+    def available(self):
+        return any([c for c in self.copies if not c.on_loan])
+
+    @property
+    def available_copies(self):
+        return len([c for c in self.copies if not c.on_loan])
+
+    @property
     def num_copies(self):
         return count(self.copies)
 
@@ -48,21 +83,26 @@ class Book(db.Entity):
         return ", ".join(author.name for author in self.authors)
 
     def before_insert(self):
-        meta_info = meta(self.isbn)
-        self.title = meta_info.get('title')
-        self.subtitle = meta_info.get('subtitle', '')
-        self.img = meta_info.get('img')
+        try:
+            meta_info = meta(self.isbn)
+        except MetaDataNotFoundError as e:
+            print('Unable to find book meta data')
+            pass
+        else:
+            self.title = meta_info.get('title')
+            self.subtitle = meta_info.get('subtitle', '')
+            self.img = meta_info.get('img')
 
-        for category in meta_info.get('categories'):
-            category = category.title()
-            genre = Genre.get(name=category)
-            if not genre:
-                genre = Genre(name=category)
-            self.genres.add(genre)
+            for category in meta_info.get('categories'):
+                category = category.title()
+                genre = Genre.get(name=category)
+                if not genre:
+                    genre = Genre(name=category)
+                self.genres.add(genre)
 
-        for name in meta_info['authors']:
-            author = get_or_create_author(name)
-            self.authors.add(author)
+            for name in meta_info['authors']:
+                author = get_or_create_author(name)
+                self.authors.add(author)
 
         self.slug = slugify(self.title)
 
@@ -81,15 +121,32 @@ class BookCopy(db.Entity):
     book = Required('Book')
     loans = Set('Loan')
 
+    @property
+    def total_loans(self):
+        return len(self.loans)
+
+    @property
+    def on_loan(self):
+        """Returns True if a book has any outstanding loans"""
+        return self.loans.select(lambda l: not l.returned).exists()
+
     def __repr__(self):
-        return '<BookCopy: {}>'.format(self.book.ibsn)
+        return '<BookCopy: {}>'.format(self.book)
 
 
 class Loan(db.Entity):
-    start_date = Required(date)
-    end_date = Required(date)
+    start_date = Optional(date, sql_default='CURRENT_DATE')
+    end_date = Optional(date)
+    returned = Optional(bool, default=False)
     customer = Required('Customer')
-    book = Required('BookCopy')
+    book_copy = Required('BookCopy')
+
+    @property
+    def due_in(self):
+        return str((self.end_date - date.today()).days) + " Days"
+
+    def after_insert(self):
+        self.end_date = self.start_date + timedelta(days=7)
 
     def __repr__(self):
         return '<Loan: {}>'.format(self.start_date)
@@ -144,7 +201,6 @@ class Author(db.Entity):
         return self.name
 
 
-# [TODO] Move get_or_create functions into model definitions
 def get_or_create_author(name):
     author = Author.get(name=name)
     if not author:

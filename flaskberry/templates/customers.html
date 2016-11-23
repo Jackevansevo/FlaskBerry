@@ -3,20 +3,18 @@
 <main class="mw6 center">
 <article>
     {% for customer in customers %}
-        <a class="link dt w-100 bb b--black-10 pb2 mt2 dim blue" href="#0">
+        <p class="dt w-100 bb b--black-10 pb2 mt2 dim blue">
             <div class="dtc v-top pl2">
                 <h1 class="f6 f5-ns fw6 lh-title black mv0">{{ customer }}</h1>
+                <p>{{ customer.email }}</p>
+                <p>{{ customer.password }}</p>
                 <h2 class="f6 fw4 mt2 mb0 black-60">
                     {% for book in customer.books %}
                         {{book }}
                     {% endfor %}
                 </h2>
-                <dl class="mt2 f6">
-                    <dt class="clip">Price</dt>
-                    <dd class="ml0">Manage</dd>
-                </dl>
             </div>
-        </a>
+        </p>
     {% endfor %}
 </article>
 </main>

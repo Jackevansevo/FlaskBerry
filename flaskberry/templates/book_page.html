@@ -2,9 +2,11 @@
 {% block body %}
 {% if book %}
     <article class="mw5 center bg-white br3 pa3 pa4-ns mv3 ba b--black-10 relative">
-        <form method="post" action="{{ url_for('delete_book', isbn=book.isbn) }}">
-            <button class="hover-red pointer bn button-reset bg-white absolute bottom-1 right-1" type="submit"><i class="fa fa-trash fa-fw" aria-hidden="true"></i></button>
-        </form>
+        {% if current_user.is_authenticated %}
+            <form method="post" action="{{ url_for('delete_book', isbn=book.isbn) }}">
+                <button class="hover-red pointer bn button-reset bg-white absolute bottom-1 right-1" type="submit"><i class="fa fa-trash fa-fw" aria-hidden="true"></i></button>
+            </form>
+        {% endif %}
         <div class="tc">
             <img src="{{ book.img }}" alt="{{ book.title }} - Book Cover" class="center db br3">
             <h1 class="f4">{{ book.title }}</h1>
@@ -20,17 +22,27 @@
             <b>ISBN: </b> {{ book.isbn }}
         </p>
         <p class="lh-copy measure center tc f6 black-70">
-            <b>Copies: </b> {{ book.num_copies }}
-        </p>
-        <p class="lh-copy measure center tc f6 black-70">
             <b>Genres: </b>
             {% for genre in book.genres %}
                 <a class="link hover-gray" href="{{ genre.url }}">{{ genre }}</a>
             {% endfor %}
         </p>
-        <form class="tc pv3" method="get" action="{{ url_for('checkout_book', slug=book.slug) }}">
-            <input class="b green ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Checkout">
-        </form>
+        <p class="lh-copy measure center tc f6 black-70">
+            <b>Copies: </b> {{ book.num_copies }}
+        </p>
+        <p class="lh-copy measure center tc f6 black-70">
+            <b>Avaialble: </b> {{ book.available_copies }}
+        </p>
+        {% if current_user.is_authenticated and book.available and current_user.can_loan %}
+            <form class="tc pv3" method="post" action="{{ url_for('checkout_book', slug=book.slug) }}">
+                <input class="b green ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Checkout">
+            </form>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.has_book(book.isbn) %}
+            <form class="tc pv3" method="post" action="{{ url_for('return_book', slug=book.slug) }}">
+                <input class="b red ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Return Book">
+            </form>
+        {% endif %}
     </article>
 {% else %}
     <p class="tc dark-red lh-copy">Book not found</p>

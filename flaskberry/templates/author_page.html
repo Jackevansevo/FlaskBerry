@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block body %}
-<h1 class="pl4">{{ author.name }} Books</h1>
+<h1 class="pl4">Author: {{ author.name }}</h1>
 <article>
     <div class="cf pa2">
         {% for book in author.books %}
             <div class="fl w-50 w-25-m w-10-l pa3">
                 <a href="{{ book.url }}" class="db link dim tc">
                     <div class="aspect-ratio aspect-ratio--3x4 mb4">
-                        <div class="aspect-ratio--object cover br4" style="background:url({{book.img}}) center;"></div>
+                        <div class="aspect-ratio--object cover br4 cover {% if not book.available %} o-10 ba b--black {% endif %}" style="background:url( {{book.img}} );"></div>
                     </div>
                     <dl class="mt2 f6 lh-copy">
                         <dt class="clip">Title</dt>

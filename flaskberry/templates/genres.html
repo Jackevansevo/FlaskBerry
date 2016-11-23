@@ -23,14 +23,5 @@
             {% endfor %}
         {% endfor %}
     </article>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div>
-                {% for message in messages %}
-                    <p class="tc f5 lh-copy dark-red">{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
 </main>
 {% endblock body %}
