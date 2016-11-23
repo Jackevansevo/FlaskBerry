@@ -12,11 +12,15 @@ from os import environ
 # [TODO] Scrape meta data from multiple sources
 
 
-googb_api_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:{}&key={}'
 api_key = environ['BOOKS_API_KEY']
+
+googb_api_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:{}&key={}'
 
 wcat_api_url = 'http://xisbn.worldcat.org/webservices/xid/isbn/{}'\
     + '?method=getMetadata&fl=*&format=json'
+
+open_library_api = 'http://openlibrary.org/api/books?bibkeys=ISBN:{}'\
+    + '&jscmd=data&format=json'
 
 
 CLEAN_REGEX_PATTERN = compile('[^\dX]')
@@ -78,18 +82,51 @@ def clean(isbn):
 
 def request_data(isbn, url, key=None):
     try:
-        r = get(url.format(isbn, key)).json()
-    except(ValueError, RequestException):
+        r = get(url.format(isbn, key))
+    except RequestException:
         pass
     else:
         return r
 
 
+def request_json(isbn, url, key=None):
+    try:
+        json = request_data(isbn, url, key).json()
+    except(ValueError):
+        pass
+    return json
+
+
+def get_amazon_image(isbn):
+    image_url = 'http://images.amazon.com/images/P/{}'.format(isbn)
+    try:
+        r = get(image_url)
+    except RequestException:
+        pass
+    else:
+        if r.headers['Content-Type'] != 'image/gif':
+            return image_url
+        if len(isbn) == 13:
+            get_amazon_image(to_isbn10(isbn))
+
+
+def _scrape_openlibrary(isbn):
+    res = request_json(isbn, open_library_api)
+    meta = {}
+    info = next(iter(res.json().values()))
+    META_KEYS = ('title', 'subtitle', 'authors', 'subjects')
+    meta = {k: v for k, v in info.items() if k in META_KEYS}
+    meta['authors'] = [author['name'] for author in meta['authors']]
+    meta['categories'] = [subject['name'] for subject in meta.pop('subjects')]
+    meta['img'] = info['cover']['image']
+    return meta
+
+
 def _scrape_goob(isbn):
     META_KEYS = ('title', 'subtitle', 'authors', 'categories')
-    res = request_data(isbn, googb_api_url, key=api_key)
+    res = request_json(isbn, googb_api_url, key=api_key)
     if res.get('totalItems', 0) == 0:
-        raise MetaDataNotFoundError('Unable to find', isbn)
+        return
     info = next(iter(res['items']))['volumeInfo']
     meta = {k: v for k, v in info.items() if k in META_KEYS}
     meta['img'] = info['imageLinks']['thumbnail']
@@ -98,12 +135,12 @@ def _scrape_goob(isbn):
 
 def _scrape_wcat(isbn):
     META_KEYS = ('title', 'author')
-    res = request_data(isbn, wcat_api_url)
-    return res
-    # info = next(iter(res['items']))['volumeInfo']
-    # meta = {k: v for k, v in info.items() if k in META_KEYS}
-    # meta['img'] = info['imageLinks']['thumbnail']
-    # return meta
+    res = request_json(isbn, wcat_api_url)
+    info = next(iter(res['list']))
+    meta = {k: v for k, v in info.items() if k in META_KEYS}
+    meta['img'] = "http://placehold.it/150x225"
+    meta['authors'] = [e.strip() for e in meta.pop('author').split('and')]
+    return meta
 
 
 def meta(isbn):

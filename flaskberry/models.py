@@ -93,7 +93,7 @@ class Book(db.Entity):
             self.subtitle = meta_info.get('subtitle', '')
             self.img = meta_info.get('img')
 
-            for category in meta_info.get('categories'):
+            for category in meta_info.get('categories', []):
                 category = category.title()
                 genre = Genre.get(name=category)
                 if not genre:
