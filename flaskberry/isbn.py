@@ -31,12 +31,29 @@ CLEAN_REGEX_PATTERN = compile('[^\dX]')
 AUTHOR_SUB_REGEX = compile('[^a-zA-Z\s+]|\s\;')
 
 
+# [TODO] Write function that looks up region of isbn
+
+
 class InvalidISBNError(Exception):
     pass
 
 
 class MetaDataNotFoundError(Exception):
     pass
+
+
+def has_english_identifier(isbn):
+    # https://en.wikipedia.org/wiki/List_of_ISBN_identifier_groups
+    identifier_group = ('0', '1')
+    if len(isbn) == 10:
+        # e.g. 0198739834
+        if isbn[0] in identifier_group:
+            return True
+    elif len(isbn) == 13:
+        # e.g. 9780198739838
+        if isbn[:3] == '978' and isbn[3] in identifier_group:
+            return True
+    return False
 
 
 def _calc_isbn_13_check_digit(isbn):
@@ -118,6 +135,7 @@ def get_amazon_image(isbn):
             return 'http://placehold.it/150x225'
 
 
+# Caution here be dragons, enter at your own peril
 scrape_strategies = []
 
 
@@ -135,7 +153,10 @@ def _scrape_goob(isbn):
         info = next(iter(res['items']))['volumeInfo']
         meta = {k: v for k, v in info.items() if k in META_KEYS}
         if meta:
-            meta['img'] = info['imageLinks']['thumbnail']
+            try:
+                meta['img'] = info['imageLinks']['thumbnail']
+            except KeyError:
+                return
         return meta
 
 
@@ -163,25 +184,21 @@ def _scrape_wcat(isbn):
         meta = {k: v for k, v in info.items() if k in META_KEYS}
         meta['img'] = get_amazon_image(isbn)
         meta['authors'] = [
-            sanitize_author(e) for e in meta.pop('author').split('and')
+            sub(AUTHOR_SUB_REGEX, '', e.strip())
+            for e in meta.pop('author').split('and')
         ]
         return meta
-
-
-def sanitize_author(author):
-    return sub(AUTHOR_SUB_REGEX, '', author.strip())
 
 
 def meta(isbn):
     if not isbn_is_valid(isbn):
         raise InvalidISBNError('Invalid ISBN', isbn)
-    # Loops through each scrape_stategy and returns first non empty result
 
     # Check the cache
     if isbn in meta_cache:
         return meta_cache[isbn]
 
-    # Scrape sources
+    # Loops through each scrape_stategy and returns first non empty result
     for strat in scrape_strategies:
         data = strat(isbn)
         if data:

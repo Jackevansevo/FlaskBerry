@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 from flask import url_for
 from slugify import slugify
 from flask_login import UserMixin
+from titlecase import titlecase
 
 from pony.orm import Optional, PrimaryKey, Required, Set, count, commit, select
 
@@ -110,7 +111,7 @@ class Book(db.Entity):
         self.img = meta_info.get('img')
 
         for category in meta_info.get('categories', []):
-            category = category.title()
+            category = titlecase(category)
             genre = Genre.get(name=category)
             if not genre:
                 genre = Genre(name=category)

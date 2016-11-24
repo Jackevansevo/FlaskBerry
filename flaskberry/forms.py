@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired
 
-from .isbn import clean, to_isbn13, is_isbn13, meta
+from .isbn import clean, to_isbn13, is_isbn13, meta, has_english_identifier
 from .models import Book, Customer
 
 
@@ -17,6 +17,9 @@ class BookSubmissionForm(FlaskForm):
         field.data = to_isbn13(field.data)
         if not is_isbn13(field.data):
             raise ValidationError('ISBN Number was Invalid')
+        if not has_english_identifier(field.data):
+            error_msg = 'ISBN Contains a non English-language identifier'
+            raise ValidationError(error_msg)
         if not meta(field.data):
             raise ValidationError('Book Meta-data not found')
 
