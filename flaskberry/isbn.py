@@ -13,11 +13,15 @@ api_key = environ['BOOKS_API_KEY']
 
 googb_api_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:{}&key={}'
 
-wcat_api_url = 'http://xisbn.worldcat.org/webservices/xid/isbn/{}'\
-    + '?method=getMetadata&fl=*&format=json'
+wcat_api_url = (
+    'http://xisbn.worldcat.org/webservices/xid/isbn/{}'
+    '?method=getMetadata&fl=*&format=json'
+)
 
-open_library_api = 'http://openlibrary.org/api/books?bibkeys=ISBN:{}'\
-    + '&jscmd=data&format=json'
+open_library_api = (
+    'http://openlibrary.org/api/books?bibkeys=ISBN:{}'
+    '&jscmd=data&format=json'
+)
 
 
 CLEAN_REGEX_PATTERN = compile('[^\dX]')
