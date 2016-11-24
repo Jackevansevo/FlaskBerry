@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired
 
-from .isbn import clean, to_isbn13, is_isbn13
+from .isbn import clean, to_isbn13, is_isbn13, meta
 from .models import Book, Customer
 
 
@@ -17,6 +17,8 @@ class BookSubmissionForm(FlaskForm):
         field.data = to_isbn13(field.data)
         if not is_isbn13(field.data):
             raise ValidationError('ISBN Number was Invalid')
+        if not meta(field.data):
+            raise ValidationError('Book Meta-data not found')
 
 
 class BookCheckoutForm(FlaskForm):
@@ -47,7 +49,7 @@ class LoginForm(FlaskForm):
             return False
 
         if not user.check_password(self.password.data):
-            self.password.errors.append('Password incorrect')
+            self.password.errors.append('Invalid password')
             return False
 
         self.user = user

@@ -6,9 +6,7 @@ from flask_login import UserMixin
 from pony.orm import Optional, PrimaryKey, Required, Set, count, commit, select
 
 from flaskberry import db, bcrypt
-from flaskberry.isbn import meta, MetaDataNotFoundError
-
-# [TODO] For the love of God, please Hash the passwords
+from flaskberry.isbn import meta
 
 
 class Customer(db.Entity, UserMixin):
@@ -18,7 +16,7 @@ class Customer(db.Entity, UserMixin):
     password = Required(bytes)
     slug = Optional(str, unique=True)
     loans = Set('Loan')
-    book_allowance = Required(int, default=1)
+    book_allowance = Required(int, default=3)
 
     @property
     def is_admin(self):
@@ -82,9 +80,10 @@ class Book(db.Entity):
     reviews = Set('Review')
     copies = Set('BookCopy')
 
+    @property
     def is_available(self):
         """Returns True if any copies aren't currently on loan"""
-        return not any([c.on_loan for c in self.copies])
+        return not all([c.on_loan for c in self.copies])
 
     def get_available_copies(self):
         return [c for c in self.copies if not c.on_loan]
@@ -105,26 +104,21 @@ class Book(db.Entity):
         return ", ".join(author.name for author in self.authors)
 
     def before_insert(self):
-        try:
-            meta_info = meta(self.isbn)
-        except MetaDataNotFoundError as e:
-            print('Unable to find book meta data')
-            pass
-        else:
-            self.title = meta_info.get('title')
-            self.subtitle = meta_info.get('subtitle', '')
-            self.img = meta_info.get('img')
+        meta_info = meta(self.isbn)
+        self.title = meta_info.get('title')
+        self.subtitle = meta_info.get('subtitle', '')
+        self.img = meta_info.get('img')
 
-            for category in meta_info.get('categories', []):
-                category = category.title()
-                genre = Genre.get(name=category)
-                if not genre:
-                    genre = Genre(name=category)
-                self.genres.add(genre)
+        for category in meta_info.get('categories', []):
+            category = category.title()
+            genre = Genre.get(name=category)
+            if not genre:
+                genre = Genre(name=category)
+            self.genres.add(genre)
 
-            for name in meta_info.get('authors'):
-                author = get_or_create_author(name)
-                self.authors.add(author)
+        for name in meta_info.get('authors'):
+            author = get_or_create_author(name)
+            self.authors.add(author)
 
         self.slug = slugify(self.title)
 
@@ -191,6 +185,7 @@ class Genre(db.Entity):
 
 class Review(db.Entity):
     text = Required(str)
+    rating = Required(int)
     book = Required('Book')
 
     def __str__(self):

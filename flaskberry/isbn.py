@@ -9,6 +9,7 @@ from requests import get
 from requests.exceptions import RequestException
 from os import environ
 
+
 api_key = environ['BOOKS_API_KEY']
 
 googb_api_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:{}&key={}'
@@ -24,7 +25,10 @@ open_library_api = (
 )
 
 
+meta_cache = {}
+
 CLEAN_REGEX_PATTERN = compile('[^\dX]')
+AUTHOR_SUB_REGEX = compile('[^a-zA-Z\s+]|\s\;')
 
 
 class InvalidISBNError(Exception):
@@ -53,8 +57,9 @@ def is_isbn13(isbn):
 
 
 def _calc_isbn_10_check_digit(isbn):
-    res = 11 - sum([int(a)*b for a, b in zip(isbn, range(10, 1, -1))]) % 11
-    return 'X' if res == 10 else res
+    sum_products = sum([int(a)*b for a, b in zip(isbn, range(10, 1, -1))])
+    rem = (11 - sum_products % 11) % 11
+    return 'X' if rem == 10 else rem
 
 
 def to_isbn10(isbn):
@@ -99,7 +104,9 @@ def request_json(isbn, url, key=None):
 
 
 def get_amazon_image(isbn):
-    image_url = 'http://images.amazon.com/images/P/{}'.format(isbn)
+    """Tries to return image url from Amazon, returns placeholder fallback"""
+    # Amazon only provides book images for isbn10's
+    image_url = 'http://images.amazon.com/images/P/{}'.format(to_isbn10(isbn))
     try:
         r = get(image_url)
     except RequestException:
@@ -107,9 +114,6 @@ def get_amazon_image(isbn):
     else:
         if r.headers['Content-Type'] != 'image/gif':
             return image_url
-        if len(isbn) == 13:
-            # Result is sometimes dependent on isbn type
-            return get_amazon_image(to_isbn10(isbn))
         else:
             return 'http://placehold.it/150x225'
 
@@ -130,7 +134,8 @@ def _scrape_goob(isbn):
     if res.get('totalItems', 0) != 0:
         info = next(iter(res['items']))['volumeInfo']
         meta = {k: v for k, v in info.items() if k in META_KEYS}
-        meta['img'] = info['imageLinks']['thumbnail']
+        if meta:
+            meta['img'] = info['imageLinks']['thumbnail']
         return meta
 
 
@@ -144,7 +149,8 @@ def _scrape_openlibrary(isbn):
         meta['authors'] = [author['name'] for author in meta['authors']]
         meta['categories'] = [sub['name'] for sub in meta.pop('subjects')]
         cover = info.get('cover')
-        meta['img'] = cover.get('image') if cover else get_amazon_image(isbn)
+        if cover:
+            meta['img'] = cover.get('image') or get_amazon_image(isbn)
         return meta
 
 
@@ -152,20 +158,33 @@ def _scrape_openlibrary(isbn):
 def _scrape_wcat(isbn):
     META_KEYS = ('title', 'author')
     res = request_json(isbn, wcat_api_url)
-    info = next(iter(res['list']))
-    meta = {k: v for k, v in info.items() if k in META_KEYS}
-    meta['img'] = get_amazon_image(isbn)
-    meta['authors'] = [
-        e.strip().replace('.', '') for e in meta.pop('author').split('and')
-    ]
-    return meta
+    if res.get('stat') == 'ok':
+        info = next(iter(res['list']))
+        meta = {k: v for k, v in info.items() if k in META_KEYS}
+        meta['img'] = get_amazon_image(isbn)
+        meta['authors'] = [
+            sanitize_author(e) for e in meta.pop('author').split('and')
+        ]
+        return meta
+
+
+def sanitize_author(author):
+    return sub(AUTHOR_SUB_REGEX, '', author.strip())
 
 
 def meta(isbn):
     if not isbn_is_valid(isbn):
         raise InvalidISBNError('Invalid ISBN', isbn)
     # Loops through each scrape_stategy and returns first non empty result
+
+    # Check the cache
+    if isbn in meta_cache:
+        return meta_cache[isbn]
+
+    # Scrape sources
     for strat in scrape_strategies:
         data = strat(isbn)
         if data:
+            # Save the result in cache
+            meta_cache[isbn] = data
             return data

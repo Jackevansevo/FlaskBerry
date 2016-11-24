@@ -6,7 +6,7 @@ from flask_login import (
 
 from urllib.parse import urlparse, urljoin
 
-from pony.orm import select, desc, commit
+from pony.orm import select, desc
 
 from flaskberry import app
 
@@ -17,9 +17,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.session_protection = "strong"
 login_manager.login_view = "login"
-
-# [TODO] Random book of the day
-# [TODO] Reminder email when book is due
 
 
 def is_safe_url(target):
@@ -108,7 +105,6 @@ def genre(slug):
 
 
 @app.route('/customer/<string:slug>')
-@login_required
 def customer(slug):
     customer = Customer.get(slug=slug)
     if not customer:
@@ -150,10 +146,12 @@ def delete_book(isbn):
 def checkout_book(slug):
     customer = Customer.get(email=current_user.email)
     book = Book.get(slug=slug)
-    if customer.can_loan and book.is_available:
-        book_copy = book.get_available_copy()
-        Loan(customer=customer, book_copy=book_copy)
-        commit()
+    if customer.can_loan:
+        if book.is_available:
+            book_copy = book.get_available_copy()
+            Loan(customer=customer, book_copy=book_copy)
+        else:
+            flash('Book Unavailable, remaining copies checked out', 'error')
     return redirect(url_for('book', slug=slug))
 
 
@@ -170,8 +168,17 @@ def return_book(slug):
     loan = customer.loans.select(
         lambda l: not l.returned and l.book_copy.book.slug == slug).first()
     loan.returned = True
-    commit()
     return redirect(url_for('book', slug=slug))
+
+
+@app.route('/bulk_return/<slug>', methods=['POST'])
+def bulk_return(slug):
+    """Returns all outstanding books loans for a customer"""
+    customer = Customer.get(email=current_user.email)
+    for loan in customer.loans.select(lambda l: not l.returned):
+        print(loan)
+        loan.returned = True
+    return redirect(url_for('customer', slug=slug))
 
 
 @app.route('/login', methods=['GET', 'POST'])

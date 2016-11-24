@@ -3,7 +3,7 @@
 {% if book %}
     <article class="mw5 center bg-white br3 pa3 pa4-ns mv3 ba b--black-10 relative">
         {% if current_user.is_authenticated and current_user.is_admin %}
-            <form method="post" action="{{ url_for('delete_book', isbn=book.isbn) }}">
+            <form method="post" action="{{ url_for('delete_book', isbn=book.isbn) }}" accept-charset="utf-8">
                 <button class="hover-red pointer bn button-reset bg-white absolute bottom-1 right-1" type="submit"><i class="fa fa-trash fa-fw" aria-hidden="true"></i></button>
             </form>
         {% endif %}

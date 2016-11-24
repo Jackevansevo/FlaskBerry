@@ -2,7 +2,7 @@
 
 {% block search %}
 <form method="post" action="{{ url_for('books') }}">
-    <input class="pa2 input-reset ba br3 bg-light-gray" name="query" placeholder="Search Books">
+    <input class="pa2 input-reset bn br3 bg-light-gray" name="query" placeholder="Search Books">
 </form>
 {% endblock search %}
 
@@ -13,7 +13,7 @@
             <div class="fl w-50 w-25-m w-10-l pa3">
                 <a href="{{ book.url }}" class="db link dim tc">
                     <div class="aspect-ratio aspect-ratio--3x4 mb4">
-                        <div class="aspect-ratio--object br4 cover {% if not book.is_available() %} o-10 ba b--black {% endif %}" style="background:url( {{book.img}} );"></div>
+                        <div class="aspect-ratio--object br4 cover {% if not book.is_available %} o-10 ba b--black {% endif %}" style="background:url( {{book.img}} );"></div>
                     </div>
                     <dl class="mt2 f6 lh-copy">
                         <dt class="clip">Title</dt>

@@ -36,14 +36,22 @@
     <body>
         {% block body %}
         {% endblock body %}
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                <p class="red tc">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
     </body>
     {% block scripts %}
     {% endblock %}
+    <footer class="pv4 ph3 ph5-m ph6-l mid-gray">
+        <div class="tc">
+            <p class="f6 dib ph2 link mid-gray dim">
+                {% with errors = get_flashed_messages(category_filter=["error"]) %}
+                    {% if errors %}
+                        {% for msg in errors %}
+                            <p class="dark-red tc code">
+                                <i class="fa fa-exclamation fa-fw" aria-hidden="true"></i><b>Error</b>: {{ msg }}
+                            </p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </p>
+        </div>
+    </footer>
 </html>
