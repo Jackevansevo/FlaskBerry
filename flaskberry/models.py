@@ -66,12 +66,18 @@ class Book(db.Entity):
     reviews = Set('Review')
     copies = Set('BookCopy')
 
-    @property
-    def available(self):
-        return any([c for c in self.copies if not c.on_loan])
+    def is_available(self):
+        """Returns True if any copies aren't currently on loan"""
+        return not any([c.on_loan for c in self.copies])
+
+    def get_available_copies(self):
+        return [c for c in self.copies if not c.on_loan]
+
+    def get_available_copy(self):
+        return self.get_available_copies()[0]
 
     @property
-    def available_copies(self):
+    def num_available_copies(self):
         return len([c for c in self.copies if not c.on_loan])
 
     @property
@@ -122,12 +128,8 @@ class BookCopy(db.Entity):
     loans = Set('Loan')
 
     @property
-    def total_loans(self):
-        return len(self.loans)
-
-    @property
     def on_loan(self):
-        """Returns True if a book has any outstanding loans"""
+        """Returns True if a book copy has any outstanding loans"""
         return self.loans.select(lambda l: not l.returned).exists()
 
     def __repr__(self):

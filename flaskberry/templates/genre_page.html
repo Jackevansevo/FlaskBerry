@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<h1 class="pl4">{{ genre.name }} Books</h1>
+<h1 class="pl4">Genre: {{ genre.name }}</h1>
 <article>
     <div class="cf pa2">
         {% for book in genre.books %}

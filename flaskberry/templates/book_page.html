@@ -31,9 +31,9 @@
             <b>Copies: </b> {{ book.num_copies }}
         </p>
         <p class="lh-copy measure center tc f6 black-70">
-            <b>Avaialble: </b> {{ book.available_copies }}
+            <b>Avaialble: </b> {{ book.num_available_copies }}
         </p>
-        {% if current_user.is_authenticated and book.available and current_user.can_loan %}
+        {% if current_user.is_authenticated and book.is_available and current_user.can_loan %}
             <form class="tc pv3" method="post" action="{{ url_for('checkout_book', slug=book.slug) }}">
                 <input class="b green ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" type="submit" value="Checkout">
             </form>

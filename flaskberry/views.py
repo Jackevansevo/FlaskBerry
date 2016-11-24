@@ -149,8 +149,9 @@ def delete_book(isbn):
 @login_required
 def checkout_book(slug):
     customer = Customer.get(email=current_user.email)
-    if customer.can_loan:
-        book_copy = Book.get(slug=slug).copies.select().first()
+    book = Book.get(slug=slug)
+    if customer.can_loan and book.is_available:
+        book_copy = book.get_available_copy()
         Loan(customer=customer, book_copy=book_copy)
         commit()
     return redirect(url_for('book', slug=slug))
@@ -164,8 +165,10 @@ def load_user(user_id):
 @app.route('/return-book/<slug>', methods=['POST'])
 @login_required
 def return_book(slug):
-    book_copy = Book.get(slug=slug).copies.select().first()
-    loan = book_copy.loans.select(lambda l: not l.returned).first()
+    customer = Customer.get(email=current_user.email)
+    # Find the customers corresponding outstanding loans which match the slug
+    loan = customer.loans.select(
+        lambda l: not l.returned and l.book_copy.book.slug == slug).first()
     loan.returned = True
     commit()
     return redirect(url_for('book', slug=slug))

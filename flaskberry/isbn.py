@@ -9,9 +9,6 @@ from requests import get
 from requests.exceptions import RequestException
 from os import environ
 
-# [TODO] Scrape meta data from multiple sources
-
-
 api_key = environ['BOOKS_API_KEY']
 
 googb_api_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:{}&key={}'
@@ -102,51 +99,69 @@ def get_amazon_image(isbn):
     try:
         r = get(image_url)
     except RequestException:
-        pass
+        return
     else:
         if r.headers['Content-Type'] != 'image/gif':
             return image_url
         if len(isbn) == 13:
-            get_amazon_image(to_isbn10(isbn))
+            # Result is sometimes dependent on isbn type
+            return get_amazon_image(to_isbn10(isbn))
+        else:
+            return 'http://placehold.it/150x225'
 
 
-def _scrape_openlibrary(isbn):
-    res = request_json(isbn, open_library_api)
-    meta = {}
-    info = next(iter(res.json().values()))
-    META_KEYS = ('title', 'subtitle', 'authors', 'subjects')
-    meta = {k: v for k, v in info.items() if k in META_KEYS}
-    meta['authors'] = [author['name'] for author in meta['authors']]
-    meta['categories'] = [subject['name'] for subject in meta.pop('subjects')]
-    meta['img'] = info['cover']['image']
-    return meta
+scrape_strategies = []
 
 
+def scrape_stategy(scrape_func):
+    """Adds all functions with a scrape_stategy to a list"""
+    scrape_strategies.append(scrape_func)
+    return scrape_func
+
+
+@scrape_stategy
 def _scrape_goob(isbn):
     META_KEYS = ('title', 'subtitle', 'authors', 'categories')
     res = request_json(isbn, googb_api_url, key=api_key)
-    if res.get('totalItems', 0) == 0:
-        return
-    info = next(iter(res['items']))['volumeInfo']
-    meta = {k: v for k, v in info.items() if k in META_KEYS}
-    meta['img'] = info['imageLinks']['thumbnail']
-    return meta
+    if res.get('totalItems', 0) != 0:
+        info = next(iter(res['items']))['volumeInfo']
+        meta = {k: v for k, v in info.items() if k in META_KEYS}
+        meta['img'] = info['imageLinks']['thumbnail']
+        return meta
 
 
+@scrape_stategy
+def _scrape_openlibrary(isbn):
+    res = request_json(isbn, open_library_api)
+    if res:
+        info = next(iter(res.values()))
+        META_KEYS = ('title', 'subtitle', 'authors', 'subjects')
+        meta = {k: v for k, v in info.items() if k in META_KEYS}
+        meta['authors'] = [author['name'] for author in meta['authors']]
+        meta['categories'] = [sub['name'] for sub in meta.pop('subjects')]
+        cover = info.get('cover')
+        meta['img'] = cover.get('image') if cover else get_amazon_image(isbn)
+        return meta
+
+
+@scrape_stategy
 def _scrape_wcat(isbn):
     META_KEYS = ('title', 'author')
     res = request_json(isbn, wcat_api_url)
     info = next(iter(res['list']))
     meta = {k: v for k, v in info.items() if k in META_KEYS}
-    meta['img'] = "http://placehold.it/150x225"
-    meta['authors'] = [e.strip() for e in meta.pop('author').split('and')]
+    meta['img'] = get_amazon_image(isbn)
+    meta['authors'] = [
+        e.strip().replace('.', '') for e in meta.pop('author').split('and')
+    ]
     return meta
 
 
 def meta(isbn):
     if not isbn_is_valid(isbn):
         raise InvalidISBNError('Invalid ISBN', isbn)
-    data = _scrape_goob(isbn)
-    if not data:
-        data = _scrape_wcat(isbn)
-    return data
+    # Loops through each scrape_stategy and returns first non empty result
+    for strat in scrape_strategies:
+        data = strat(isbn)
+        if data:
+            return data
