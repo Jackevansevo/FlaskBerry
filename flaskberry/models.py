@@ -3,9 +3,9 @@ from flask import url_for
 from slugify import slugify
 from flask_login import UserMixin
 
-from pony.orm import Optional, PrimaryKey, Required, Set, count, commit
+from pony.orm import Optional, PrimaryKey, Required, Set, count, commit, select
 
-from flaskberry import db
+from flaskberry import db, bcrypt
 from flaskberry.isbn import meta, MetaDataNotFoundError
 
 # [TODO] For the love of God, please Hash the passwords
@@ -15,17 +15,32 @@ class Customer(db.Entity, UserMixin):
     forename = Required(str)
     surname = Required(str)
     email = Required(str)
-    password = Required(str)
+    password = Required(bytes)
     slug = Optional(str, unique=True)
     loans = Set('Loan')
     book_allowance = Required(int, default=1)
 
+    @property
+    def is_admin(self):
+        return False
+
     def get_id(self):
         return str(self.id)
 
+    @property
+    def read_list(self):
+        """Returns set of all books a user has previously loaned"""
+        return select(
+            b for b in Book if self in b.copies.loans.customer
+        ).distinct()
+
+    def has_loaned(self, isbn):
+        """Returns True if a user has previously loaned a book"""
+        return select(
+            l for l in Loan if l.book_copy.book.isbn == isbn).exists()
+
     def check_password(self, password):
-        # [TODO] Handle password hashes
-        return password == self.password
+        return bcrypt.check_password_hash(self.password, password)
 
     def has_book(self, isbn):
         return self.unreturned_loans.filter(
@@ -44,6 +59,7 @@ class Customer(db.Entity, UserMixin):
         return url_for('customer', slug=self.slug)
 
     def before_insert(self):
+        self.password = bcrypt.generate_password_hash(self.password)
         self.slug = slugify(str(self))
 
     def __repr__(self):
@@ -106,7 +122,7 @@ class Book(db.Entity):
                     genre = Genre(name=category)
                 self.genres.add(genre)
 
-            for name in meta_info['authors']:
+            for name in meta_info.get('authors'):
                 author = get_or_create_author(name)
                 self.authors.add(author)
 

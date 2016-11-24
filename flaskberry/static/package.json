@@ -1,0 +1,14 @@
+{
+  "name": "flaskberry",
+  "version": "1.0.0",
+  "description": "python library web application",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tachyons": "^4.5.5"
+  }
+}

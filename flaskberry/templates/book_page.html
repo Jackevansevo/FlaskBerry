@@ -2,7 +2,7 @@
 {% block body %}
 {% if book %}
     <article class="mw5 center bg-white br3 pa3 pa4-ns mv3 ba b--black-10 relative">
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and current_user.is_admin %}
             <form method="post" action="{{ url_for('delete_book', isbn=book.isbn) }}">
                 <button class="hover-red pointer bn button-reset bg-white absolute bottom-1 right-1" type="submit"><i class="fa fa-trash fa-fw" aria-hidden="true"></i></button>
             </form>
@@ -22,16 +22,13 @@
             <b>ISBN: </b> {{ book.isbn }}
         </p>
         <p class="lh-copy measure center tc f6 black-70">
+            <b>Copies Avaialble: </b> {{ book.num_available_copies }} / {{ book.num_copies }}
+        </p>
+        <p class="lh-copy measure center tc f6 black-70">
             <b>Genres: </b>
             {% for genre in book.genres %}
                 <a class="link hover-gray" href="{{ genre.url }}">{{ genre }}</a>
             {% endfor %}
-        </p>
-        <p class="lh-copy measure center tc f6 black-70">
-            <b>Copies: </b> {{ book.num_copies }}
-        </p>
-        <p class="lh-copy measure center tc f6 black-70">
-            <b>Avaialble: </b> {{ book.num_available_copies }}
         </p>
         {% if current_user.is_authenticated and book.is_available and current_user.can_loan %}
             <form class="tc pv3" method="post" action="{{ url_for('checkout_book', slug=book.slug) }}">

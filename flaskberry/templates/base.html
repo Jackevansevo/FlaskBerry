@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8"> 
         <title>FlaskBerry</title>
-        <link rel="stylesheet" href="https://unpkg.com/tachyons@4.5.5/css/tachyons.min.css"/>
+        <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/tachyons/css/tachyons.min.css') }}"/>
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
         <link type="image/x-icon" rel="shortcut icon" href="{{ url_for('static', filename='img/favicon-book.ico') }}?v={{1.0.0}}">
     </head>
@@ -22,7 +22,7 @@
                         <i class="fa fa-sign-out fa-fw" aria-hidden="true"></i> Sign Out
                     </button>
                 </form>
-                <a class="link hover-gray dark-gray f6 f5-l dib mr3 mr4-l" href="{{ current_user.url }}" title="Home"><i class="fa fa-user fa-fw" aria-hidden="true"></i>{{ current_user.forename }}</a>
+                <a class="link hover-gray dark-gray f6 f5-l dib mr3 mr4-l" href="{{ current_user.url }}" title="Home"><i class="fa fa-user fa-fw" aria-hidden="true"></i>Account</a>
             {% else %}
                 <a class="link hover-gray dark-gray f6 f5-l dib mr3 mr4-l" href="{{ url_for('login') }}" title="Home"><i class="fa fa-sign-in fa-fw" aria-hidden="true"></i> Login</a>
             {% endif %}

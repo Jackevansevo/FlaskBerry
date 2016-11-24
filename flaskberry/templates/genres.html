@@ -18,7 +18,6 @@
             {% for book in genre.books %}
                 <p class="pv2 ph3">
                     <a href="{{ book.url }}" class="link">{{ book }} </a>
-                    <span class="pv2 ph3 b light-silver i">#{{ book.num_copies }}</span>
                 </p>
             {% endfor %}
         {% endfor %}

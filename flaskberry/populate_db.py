@@ -27,7 +27,7 @@ def add_data():
     for i in range(1, 5):
         Customer(
             forename=faker.first_name(), surname=faker.last_name(),
-            email=faker.email(), password='test'
+            email=faker.email(), password=b'test'
         )
 
     # Create some sample books

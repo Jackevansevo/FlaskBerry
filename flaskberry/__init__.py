@@ -1,5 +1,6 @@
 from flask import Flask
 from pony.orm import Database, db_session
+from flask_bcrypt import Bcrypt
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -7,6 +8,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.wsgi_app = db_session(app.wsgi_app)
 app.config.from_object('config')
+bcrypt = Bcrypt(app)
 
 
 db = Database()
