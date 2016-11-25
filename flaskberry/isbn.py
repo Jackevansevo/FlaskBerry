@@ -167,11 +167,12 @@ def _scrape_openlibrary(isbn):
         info = next(iter(res.values()))
         META_KEYS = ('title', 'subtitle', 'authors', 'subjects')
         meta = {k: v for k, v in info.items() if k in META_KEYS}
+        if 'authors' not in meta:
+            return
         meta['authors'] = [author['name'] for author in meta['authors']]
         meta['categories'] = [sub['name'] for sub in meta.pop('subjects')]
-        cover = info.get('cover')
-        if cover:
-            meta['img'] = cover.get('image') or get_amazon_image(isbn)
+        cover = info.get('cover', {})
+        meta['img'] = cover.get('image') or get_amazon_image(isbn)
         return meta
 
 
@@ -202,6 +203,7 @@ def meta(isbn):
     for strat in scrape_strategies:
         data = strat(isbn)
         if data:
+            print(strat.__name__)
             # Save the result in cache
             meta_cache[isbn] = data
             return data

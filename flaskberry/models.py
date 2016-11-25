@@ -106,10 +106,14 @@ class Book(db.Entity):
     def author_names(self):
         return ", ".join(author.name for author in self.authors)
 
+    def before_update(self):
+        print('Updating Slug')
+        self.slug = slugify(self.title)
+
     def before_insert(self):
         meta_info = meta(self.isbn)
-        self.title = meta_info.get('title')
-        self.subtitle = meta_info.get('subtitle', '')
+        self.title = titlecase(meta_info.get('title'))
+        self.subtitle = titlecase(meta_info.get('subtitle', ''))
         self.img = meta_info.get('img')
 
         for category in meta_info.get('categories', []):

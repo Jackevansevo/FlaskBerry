@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+<article class="mw7 center br3 pa3 pa4-ns mv3 ba b--black-10">
+    <form method="post" accept-charset="utf-8">
+        {{ form.hidden_tag() }}
+        <fieldset id="sign_up" class="ba b--transparent ph0 mh0">
+            <legend class="ph0 mh0 fw6 clip">Login</legend>
+            <div class="mt3">
+                <label class="db fw4 lh-copy f6" for="name">Name</label>
+                <input class="pa2 input-reset ba bg-transparent w-100 measure" type="text" name="name" id="name" value="{{ form.name.data }}">
+                {% if form.name.errors %}
+                    {% for error in form.name.errors %}
+                        <p class="dark-red">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="mt3"><input class="b ph3 pv2 input-reset green ba b--black bg-transparent grow pointer f6" type="submit" value="Update Book"></div>
+    </form>
+</article>
+{% endblock %}
+{% block scripts %}
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}

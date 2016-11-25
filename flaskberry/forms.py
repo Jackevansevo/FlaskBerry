@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, StringField, PasswordField, ValidationError
-from wtforms.validators import DataRequired
+
+from wtforms import IntegerField, PasswordField, StringField, ValidationError
+
+from wtforms.validators import DataRequired, Email
 
 from .isbn import clean, to_isbn13, is_isbn13, meta, has_english_identifier
 from .models import Book, Customer
@@ -38,7 +40,7 @@ class BookCheckoutForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
 
     def validate(self):
@@ -57,3 +59,17 @@ class LoginForm(FlaskForm):
 
         self.user = user
         return True
+
+
+class AuthorForm(FlaskForm):
+    name = StringField(validators=[DataRequired()])
+
+
+class GenreUpdateForm(FlaskForm):
+    name = StringField(validators=[DataRequired()])
+
+
+class BookForm(FlaskForm):
+    title = StringField(validators=[DataRequired()])
+    subtitle = StringField()
+    img = StringField('The image URL')

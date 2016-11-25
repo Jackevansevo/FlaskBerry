@@ -44,7 +44,7 @@ def add_data():
             email=faker.email(), password=b'test'
         )
     Customer(
-        forename="jack", surname="evans", email="jack@evans.gb.net",
+        forename="Jack", surname="Evans", email="jack@evans.gb.net",
         password=b'test'
     )
 

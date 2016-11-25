@@ -34,7 +34,7 @@ def setup_periodic_tasks(sender, **kwargs):
 @celery.task
 @db_session
 def send_reminder_emails():
-    # Find all the Customers with unreturned loans
+    # Find all the Customers witkh unreturned loans
     customers = Customer.select()
     for customer in customers:
         outstanding_loans = customer.unreturned_loans
