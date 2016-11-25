@@ -9,6 +9,8 @@ from pony.orm import Optional, PrimaryKey, Required, Set, count, commit, select
 from flaskberry import db, bcrypt
 from flaskberry.isbn import meta
 
+# [TODO] Figure out better slugify strategy
+
 
 class Customer(db.Entity, UserMixin):
     forename = Required(str)

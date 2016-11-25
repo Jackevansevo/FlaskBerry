@@ -1,6 +1,9 @@
 *.pyc
-__pycache__/
-db.sqlite
 */static/node_modules/*
+__pycache__/
+celerybeat-schedule.db
+db.sqlite
+dump.rdb
+sys
 tags*
 venv/*

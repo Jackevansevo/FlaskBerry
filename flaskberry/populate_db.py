@@ -43,6 +43,10 @@ def add_data():
             forename=faker.first_name(), surname=faker.last_name(),
             email=faker.email(), password=b'test'
         )
+    Customer(
+        forename="jack", surname="evans", email="jack@evans.gb.net",
+        password=b'test'
+    )
 
     # Create some sample books
     [add_book_copy(isbn=to_isbn13(isbn)) for isbn in books]

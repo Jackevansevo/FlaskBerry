@@ -14,10 +14,24 @@ Simple library software built using:
     source venv/bin/activate
     pip install -r requirements.txt
 
+## Setup Environment
 
-## Setup Database
+First populate the database
 
-    python populate_db.py
+    python manage.py populate_db.py
+
+In three separate terminals, run:
+
+    python manage.py beat
+    python manage.py celery
+    python manage.py runserver
+
+
+The loglevel flag can be passed to celery to aid debugging: 
+
+    python manage.py celery --loglevel=info
+
+Then visit: [http://localhost:5000/](http://localhost:5000/)
 
 
 ## Screenshot

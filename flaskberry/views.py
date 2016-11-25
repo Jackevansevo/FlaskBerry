@@ -1,22 +1,13 @@
 from flask import abort, flash, redirect, render_template, request, url_for
-
-from flask_login import (
-    current_user, login_user, logout_user, login_required, LoginManager
-)
-
+from flask_login import current_user, login_user, logout_user, login_required
+from pony.orm import select, desc
 from urllib.parse import urlparse, urljoin
 
-from pony.orm import select, desc
-
-from flaskberry import app
-
+from .tasks import send_async_email
 from .forms import BookSubmissionForm, LoginForm
 from .models import Author, Book, Customer, Genre, Loan, add_book_copy
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.session_protection = "strong"
-login_manager.login_view = "login"
+from . import app, login_manager
 
 
 def is_safe_url(target):
@@ -150,6 +141,10 @@ def checkout_book(slug):
         if book.is_available:
             book_copy = book.get_available_copy()
             Loan(customer=customer, book_copy=book_copy)
+            send_async_email.delay(
+                'Thank you!', [customer.email],
+                body='Thanks for lending: {}'.format(book.title),
+            )
         else:
             flash('Book Unavailable, remaining copies checked out', 'error')
     return redirect(url_for('book', slug=slug))
