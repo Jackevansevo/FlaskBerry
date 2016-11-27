@@ -20,7 +20,7 @@ app.config.from_object('config')
 db = Database()
 
 # Create the database file if it doesn't already exist
-db.bind('sqlite', os.path.join(basedir, 'db.sqlite'), create_db=True)
+db.bind('postgres', user='', password='', host='', database='flaskberry')
 
 # Set up bcrypt
 bcrypt = Bcrypt(app)

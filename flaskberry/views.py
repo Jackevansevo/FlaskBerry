@@ -24,6 +24,7 @@ def index():
 
 @app.route('/books', methods=['GET', 'POST'])
 def books():
+    # [TODO] Paginate results
     if request.method == 'POST':
         return redirect(url_for('search_books', query=request.form['query']))
     books = Book.select().order_by(desc(Book.created_at))
@@ -32,8 +33,10 @@ def books():
 
 @app.route('/books/search/<string:query>')
 def search_books(query):
-    books = select(b for b in Book if query in b.title)
-    books = books.order_by(desc(Book.created_at))
+    books = Book.select_by_sql(
+        "SELECT * FROM Book WHERE to_tsvector(title) @@ to_tsquery($query)"
+        "ORDER BY created_at DESC"
+    )
     return render_template('books.html', books=books)
 
 

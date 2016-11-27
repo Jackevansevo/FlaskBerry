@@ -184,6 +184,8 @@ def _scrape_wcat(isbn):
         info = next(iter(res['list']))
         meta = {k: v for k, v in info.items() if k in META_KEYS}
         meta['img'] = get_amazon_image(isbn)
+        if 'authors' not in meta:
+            return
         meta['authors'] = [
             sub(AUTHOR_SUB_REGEX, '', e.strip())
             for e in meta.pop('author').split('and')

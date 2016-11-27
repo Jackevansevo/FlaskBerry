@@ -72,8 +72,8 @@ class Customer(db.Entity, UserMixin):
 
 class Book(db.Entity):
     isbn = PrimaryKey(str)
-    title = Optional(str)
-    subtitle = Optional(str)
+    title = Optional(str, autostrip=True)
+    subtitle = Optional(str, autostrip=True)
     img = Optional(str)
     slug = Optional(str)
     created_at = Required(datetime, sql_default='CURRENT_TIMESTAMP')

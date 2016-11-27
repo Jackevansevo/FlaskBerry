@@ -5,4 +5,5 @@ flask-bcrypt
 flask_script
 pony
 python-slugify
+redis
 requests
